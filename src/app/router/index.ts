@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Handler, Route } from './types.ts';
+import { parseBody } from '../../shared/utils/parseBody.ts';
 
 const routes: Route[] = [];
 
@@ -62,7 +63,8 @@ export async function handleRoute(req: IncomingMessage, res: ServerResponse) {
       continue;
     }
 
-    await route.handler(req, res, params);
+    const body = await parseBody(req);
+    await route.handler({ req, res, params, body });
 
     return;
   }

@@ -1,42 +1,80 @@
-import * as service from '../service/flights.service.ts';
-
-import { parseBody } from '../../../shared/utils/parseBody.ts';
-
-import { createFlightSchema } from '../validation/createFlight.schema.ts';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { AppError } from '../../../shared/errors/AppError.ts';
+import type { CreateFlightDto, Flight, FlightFilters } from '../types/flight.types.ts';
+import { flightStatusEnum } from '../data/flights.schema.ts';
+import { flightsService } from '../service/flights.service.ts';
 
-export async function getFlightsController(_req: IncomingMessage, res: ServerResponse) {
-  const flights = service.getFlights();
-
-  res.writeHead(200);
-
-  res.end(JSON.stringify(flights));
+function send(res: ServerResponse, status: number, data: unknown) {
+  res.writeHead(status, {
+    'Content-Type': 'application/json',
+  });
+  res.end(JSON.stringify(data));
 }
 
-export async function getFlightController(_req: IncomingMessage, res: ServerResponse, params?: Record<string, string>) {
-  const id = params?.id;
+export const flightsController = {
+  async getAll({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
+    const url = new URL(req.url!, 'http://localhost');
 
-  const flight = service.getFlight(id!);
+    const filters: FlightFilters = {
+      status: (url.searchParams.get('status') as Flight['status'] | null) ?? undefined,
+      origin: url.searchParams.get('origin') ?? undefined,
+      destination: url.searchParams.get('destination') ?? undefined,
+      search: url.searchParams.get('search') ?? undefined,
+      limit: Number(url.searchParams.get('limit') ?? 20),
+      offset: Number(url.searchParams.get('offset') ?? 0),
+    };
 
-  if (!flight) {
-    throw new AppError(404, 'Flight not found');
-  }
+    if (filters.status && !flightStatusEnum.enumValues.includes(filters.status)) {
+      throw new AppError(400, `Invalid status. Valid values: ${flightStatusEnum.enumValues.join(', ')}`);
+    }
 
-  res.writeHead(200);
+    const result = await flightsService.getFlights(filters);
+    send(res, 200, result);
+  },
 
-  res.end(JSON.stringify(flight));
-}
+  async getById({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
+    const id = req.url!.split('/').at(-1)!;
 
-export async function createFlightController(req: IncomingMessage, res: ServerResponse) {
-  const body = await parseBody(req);
+    const flight = await flightsService.getFlightById(id);
+    send(res, 200, { data: flight });
+  },
 
-  const data = createFlightSchema.parse(body);
+  async create({ req, res, body }: { req: IncomingMessage; res: ServerResponse; body: unknown }) {
+    const flight = await flightsService.createFlight(body as CreateFlightDto);
+    send(res, 201, { data: flight });
+  },
 
-  const flight = service.createFlight(data);
+  async updateStatus({
+    req,
+    res,
+    params,
+    body,
+  }: {
+    req: IncomingMessage;
+    res: ServerResponse;
+    params: Record<string, string>;
+    body: unknown;
+  }) {
+    const parts = req.url!.split('/');
 
-  res.writeHead(201);
+    const id = parts.at(-2)!;
 
-  res.end(JSON.stringify(flight));
-}
+    const { status } = body as { status?: Flight['status'] };
+
+    if (!status || !flightStatusEnum.enumValues.includes(status)) {
+      throw new AppError(400, `Invalid status. Valid values: ${flightStatusEnum.enumValues.join(', ')}`);
+    }
+
+    const flight = await flightsService.updateStatus(id, status);
+    send(res, 200, { data: flight });
+  },
+
+  async remove({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
+    const id = req.url!.split('/').at(-1)!;
+
+    await flightsService.deleteFlight(id);
+    res.writeHead(204);
+    res.end();
+  },
+};
 

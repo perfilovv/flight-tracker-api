@@ -1,8 +1,13 @@
 import { registerRoute } from '../../../app/router/index.ts';
-import { createFlightController, getFlightController, getFlightsController } from '../controller/flights.controller.ts';
+import { flightsController } from '../controller/flights.controller.ts';
 
-registerRoute('GET', '/api/flights', getFlightsController);
+registerRoute('GET', '/api/flights', flightsController.getAll);
 
-registerRoute('GET', '/api/flights/:id', getFlightController);
+registerRoute('GET', '/api/flights/:id', flightsController.getById);
 
-registerRoute('POST', '/api/flights', createFlightController);
+registerRoute('POST', '/api/flights', flightsController.create);
+
+registerRoute('PATCH', '/api/flights/:id/status', flightsController.updateStatus);
+
+registerRoute('DELETE', '/api/flights/:id', flightsController.remove);
+
