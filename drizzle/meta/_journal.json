@@ -15,6 +15,13 @@
       "when": 1779623645870,
       "tag": "0001_glossy_ted_forrester",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782072792359,
+      "tag": "0002_many_stryfe",
+      "breakpoints": true
     }
   ]
 }

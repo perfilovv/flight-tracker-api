@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, type SQL } from 'drizzle-orm';
+import { and, between, count, desc, eq, gte, ilike, lte, type SQL } from 'drizzle-orm';
 import type { CreateFlightDto, Flight, FlightFilters } from '../types/flight.types.ts';
 import { flightsTable } from '../data/flights.schema.ts';
 import { db } from '../../../app/config/database.ts';
@@ -21,6 +21,15 @@ function buildConditions(filters: FlightFilters): SQL[] {
   if (filters.search) {
     conditions.push(ilike(flightsTable.flightNumber, `%${filters.search}%`));
   }
+
+  if (filters.dateFrom && filters.dateTo) {
+    conditions.push(between(flightsTable.departureTime, new Date(filters.dateFrom), new Date(filters.dateTo)));
+  } else if (filters.dateFrom) {
+    conditions.push(gte(flightsTable.departureTime, new Date(filters.dateFrom)));
+  } else if (filters.dateTo) {
+    conditions.push(lte(flightsTable.departureTime, new Date(filters.dateTo)));
+  }
+
   return conditions;
 }
 
@@ -78,6 +87,10 @@ export const flightsRepository = {
     const [deleted] = await db.delete(flightsTable).where(eq(flightsTable.id, id)).returning({ id: flightsTable.id });
 
     return !!deleted;
+  },
+
+  async getStats() {
+    return db.select({ status: flightsTable.status, count: count() }).from(flightsTable).groupBy(flightsTable.status);
   },
 };
 

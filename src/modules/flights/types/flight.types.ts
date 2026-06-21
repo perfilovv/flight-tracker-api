@@ -20,5 +20,7 @@ export interface FlightFilters {
   search?: string;
   limit?: number;
   offset?: number;
+  dateFrom?: string;
+  dateTo?: string;
 }
 

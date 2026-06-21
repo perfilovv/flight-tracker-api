@@ -29,6 +29,15 @@ export const flightsTable = pgTable(
 
     createdAt: timestamp('created at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [index('flights_status_idx').on(table.status), index('flights_origin_idx').on(table.origin)],
+  (table) => [
+    index('flights_departure_time_idx').on(table.departureTime),
+
+    index('flights_origin_idx').on(table.origin),
+    index('flights_destination_idx').on(table.destination),
+
+    index('flights_origin_departure_idx').on(table.origin, table.departureTime),
+
+    index('flights_status_departure_idx').on(table.status, table.departureTime),
+  ],
 );
 

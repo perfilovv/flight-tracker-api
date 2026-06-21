@@ -3,6 +3,8 @@ import { flightsController } from '../controller/flights.controller.ts';
 
 registerRoute('GET', '/api/flights', flightsController.getAll);
 
+registerRoute('GET', '/api/flights/stats', flightsController.getStats);
+
 registerRoute('GET', '/api/flights/:id', flightsController.getById);
 
 registerRoute('POST', '/api/flights', flightsController.create);

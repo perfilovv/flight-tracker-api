@@ -1,8 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { AppError } from '../../../shared/errors/AppError.ts';
-import type { CreateFlightDto, Flight, FlightFilters } from '../types/flight.types.ts';
+import type { CreateFlightDto, Flight } from '../types/flight.types.ts';
 import { flightStatusEnum } from '../data/flights.schema.ts';
 import { flightsService } from '../service/flights.service.ts';
+import { parseFlightFilters } from '../../../shared/utils/parseQueryParams.ts';
 
 function send(res: ServerResponse, status: number, data: unknown) {
   res.writeHead(status, {
@@ -15,14 +16,7 @@ export const flightsController = {
   async getAll({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
     const url = new URL(req.url!, 'http://localhost');
 
-    const filters: FlightFilters = {
-      status: (url.searchParams.get('status') as Flight['status'] | null) ?? undefined,
-      origin: url.searchParams.get('origin') ?? undefined,
-      destination: url.searchParams.get('destination') ?? undefined,
-      search: url.searchParams.get('search') ?? undefined,
-      limit: Number(url.searchParams.get('limit') ?? 20),
-      offset: Number(url.searchParams.get('offset') ?? 0),
-    };
+    const filters = parseFlightFilters(url);
 
     if (filters.status && !flightStatusEnum.enumValues.includes(filters.status)) {
       throw new AppError(400, `Invalid status. Valid values: ${flightStatusEnum.enumValues.join(', ')}`);
@@ -75,6 +69,11 @@ export const flightsController = {
     await flightsService.deleteFlight(id);
     res.writeHead(204);
     res.end();
+  },
+
+  async getStats({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
+    const stats = await flightsService.getStats();
+    send(res, 200, { data: stats });
   },
 };
 

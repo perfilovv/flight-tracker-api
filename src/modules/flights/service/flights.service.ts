@@ -47,5 +47,15 @@ export const flightsService = {
 
     return flight;
   },
+
+  async getStats() {
+    const stats = await flightsRepository.getStats();
+
+    if (!stats) {
+      throw new AppError(404, 'No flights found');
+    }
+
+    return stats;
+  },
 };
 
