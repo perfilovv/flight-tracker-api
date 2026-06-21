@@ -5,7 +5,7 @@ export type Handler = (ctx: {
   res: ServerResponse;
   params: Record<string, string>;
   body: unknown;
-}) => Promise<void>;
+}) => void | Promise<void>;
 
 export type Route = {
   method: string;
