@@ -22,6 +22,13 @@
       "when": 1782072792359,
       "tag": "0002_many_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782652800048,
+      "tag": "0003_neat_thing",
+      "breakpoints": true
     }
   ]
 }

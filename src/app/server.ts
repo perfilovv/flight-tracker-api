@@ -1,20 +1,55 @@
-import { createServer } from 'node:http';
-import { runMiddlewares } from './middleware/runner.ts';
-import { config } from './config/index.ts';
-import { handleRoute } from './router/index.ts';
-import { errorHandler } from './error/globalErrorHandler.ts';
+import fastify, { type FastifyError, type FastifyReply, type FastifyRequest } from 'fastify';
+import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
+import { healthPlugin } from './routes/health.routes.ts';
+import { flightsPlugin } from '../modules/flights/routes/flights.routes.ts';
+import { AppError } from '../shared/errors/AppError.ts';
+import jwt from '@fastify/jwt';
+import { authPlugin } from '../modules/auth/routes/auth.routes.ts';
 
-export function startServer() {
-  return createServer((req, res) => {
-    runMiddlewares(req, res, async () => {
-      try {
-        await handleRoute(req, res);
-      } catch (error) {
-        errorHandler(error, res);
-      }
-    });
-  }).listen(config.port, () => {
-    console.log(`Server running on port ${config.port}`);
+export async function buildServer() {
+  const app = fastify({
+    logger: {
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+      transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
+    },
   });
+
+  app.setErrorHandler((error: FastifyError, request, reply) => {
+    if (error instanceof AppError) {
+      reply.code(error.statusCode).send({ error: error.message });
+      return;
+    }
+
+    if (error.validation) {
+      reply.code(400).send({ error: error.message });
+      return;
+    }
+
+    request.log.error(error);
+    reply.code(500).send({ error: 'Internal server error' });
+  });
+
+  await app.register(cors, {
+    origin: true,
+  });
+  await app.register(helmet, { contentSecurityPolicy: false });
+  await app.register(jwt, {
+    secret: process.env.JWT_SECRET!,
+  });
+
+  await app.register(healthPlugin, { prefix: '/api/' });
+  await app.register(flightsPlugin, { prefix: '/api/' });
+  await app.register(authPlugin, { prefix: '/api/' });
+
+  return app;
+}
+
+export async function verifyToken(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    await request.jwtVerify();
+  } catch {
+    reply.code(401).send({ message: 'Unauthorized' });
+  }
 }
 

@@ -1,9 +1,18 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import { AppError } from '../../../shared/errors/AppError.ts';
-import type { CreateFlightDto, Flight } from '../types/flight.types.ts';
-import { flightStatusEnum } from '../data/flights.schema.ts';
+import type { ServerResponse } from 'node:http';
+import type { CreateFlightDto, Flight, FlightFilters } from '../types/flight.types.ts';
 import { flightsService } from '../service/flights.service.ts';
-import { parseFlightFilters } from '../../../shared/utils/parseQueryParams.ts';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+
+type GetAllQuery = FlightFilters;
+export type GetByIdParams = {
+  id: string;
+};
+export type UpdateStatusParams = {
+  id: string;
+};
+export type UpdateStatusBody = {
+  status: Flight['status'];
+};
 
 function send(res: ServerResponse, status: number, data: unknown) {
   res.writeHead(status, {
@@ -13,67 +22,40 @@ function send(res: ServerResponse, status: number, data: unknown) {
 }
 
 export const flightsController = {
-  async getAll({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
-    const url = new URL(req.url!, 'http://localhost');
-
-    const filters = parseFlightFilters(url);
-
-    if (filters.status && !flightStatusEnum.enumValues.includes(filters.status)) {
-      throw new AppError(400, `Invalid status. Valid values: ${flightStatusEnum.enumValues.join(', ')}`);
-    }
-
-    const result = await flightsService.getFlights(filters);
-    send(res, 200, result);
+  getAll: async (request: FastifyRequest<{ Querystring: GetAllQuery }>, reply: FastifyReply) => {
+    request.log.info({ filters: request.query }, 'fetching flights');
+    const result = await flightsService.getFlights(request.query);
+    request.log.info({ total: result.total }, 'flights fetched');
+    return result;
   },
 
-  async getById({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
-    const id = req.url!.split('/').at(-1)!;
-
-    const flight = await flightsService.getFlightById(id);
-    send(res, 200, { data: flight });
+  getById: async (request: FastifyRequest<{ Params: GetByIdParams }>, reply: FastifyReply) => {
+    const flight = await flightsService.getFlightById(request.params.id);
+    return { data: flight };
   },
 
-  async create({ req, res, body }: { req: IncomingMessage; res: ServerResponse; body: unknown }) {
-    const flight = await flightsService.createFlight(body as CreateFlightDto);
-    send(res, 201, { data: flight });
+  create: async (request: FastifyRequest<{ Body: CreateFlightDto }>, reply: FastifyReply) => {
+    const flight = await flightsService.createFlight(request.body);
+    reply.code(201);
+    return { data: flight };
   },
 
-  async updateStatus({
-    req,
-    res,
-    params,
-    body,
-  }: {
-    req: IncomingMessage;
-    res: ServerResponse;
-    params: Record<string, string>;
-    body: unknown;
-  }) {
-    const parts = req.url!.split('/');
-
-    const id = parts.at(-2)!;
-
-    const { status } = body as { status?: Flight['status'] };
-
-    if (!status || !flightStatusEnum.enumValues.includes(status)) {
-      throw new AppError(400, `Invalid status. Valid values: ${flightStatusEnum.enumValues.join(', ')}`);
-    }
-
-    const flight = await flightsService.updateStatus(id, status);
-    send(res, 200, { data: flight });
+  updateStatus: async (
+    request: FastifyRequest<{ Params: UpdateStatusParams; Body: UpdateStatusBody }>,
+    reply: FastifyReply,
+  ) => {
+    const flight = await flightsService.updateStatus(request.params.id, request.body.status);
+    return { data: flight };
   },
 
-  async remove({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
-    const id = req.url!.split('/').at(-1)!;
-
-    await flightsService.deleteFlight(id);
-    res.writeHead(204);
-    res.end();
+  remove: async (request: FastifyRequest<{ Params: GetByIdParams }>, reply: FastifyReply) => {
+    await flightsService.deleteFlight(request.params.id);
+    reply.code(204);
   },
 
-  async getStats({ req, res }: { req: IncomingMessage; res: ServerResponse }) {
+  getStats: async () => {
     const stats = await flightsService.getStats();
-    send(res, 200, { data: stats });
+    return { data: stats };
   },
 };
 
