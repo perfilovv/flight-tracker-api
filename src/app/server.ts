@@ -6,12 +6,13 @@ import { flightsPlugin } from '../modules/flights/routes/flights.routes.ts';
 import { AppError } from '../shared/errors/AppError.ts';
 import jwt from '@fastify/jwt';
 import { authPlugin } from '../modules/auth/routes/auth.routes.ts';
+import { config } from './config/index.ts';
 
 export async function buildServer() {
   const app = fastify({
     logger: {
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-      transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
+      level: config.nodeEnv === 'production' ? 'info' : 'debug',
+      transport: config.nodeEnv !== 'production' ? { target: 'pino-pretty' } : undefined,
     },
   });
 
@@ -35,7 +36,7 @@ export async function buildServer() {
   });
   await app.register(helmet, { contentSecurityPolicy: false });
   await app.register(jwt, {
-    secret: process.env.JWT_SECRET!,
+    secret: config.jwtSecret,
   });
 
   await app.register(healthPlugin, { prefix: '/api/' });

@@ -25,9 +25,9 @@ export const flightsTable = pgTable(
       length: 10,
     }),
 
-    updatedAt: timestamp('updated_at', { withTimezone: true }),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).$onUpdate(() => new Date()),
 
-    createdAt: timestamp('created at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
     index('flights_departure_time_idx').on(table.departureTime),

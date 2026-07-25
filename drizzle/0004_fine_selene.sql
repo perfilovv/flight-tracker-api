@@ -1,0 +1,1 @@
+ALTER TABLE "flights" RENAME COLUMN "created at" TO "created_at";

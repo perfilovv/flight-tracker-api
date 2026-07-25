@@ -5,7 +5,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535),
   NODE_ENV: z.string().optional(),
   DATABASE_URL: z.url(),
-  JWT_SECRET: z.string().optional(),
+  JWT_SECRET: z.string(),
 });
 
 const env = envSchema.parse(process.env);
