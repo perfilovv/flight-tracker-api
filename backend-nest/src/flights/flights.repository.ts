@@ -14,6 +14,7 @@ import { flightsTable } from 'src/database/schema';
 import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { CreateFlightDto } from './dto/create-flight.dto';
+import { UpdateFlightDto } from './dto/update-flight.dto';
 
 function buildConditions(filters: FlightFilters): SQL[] {
   const conditions: SQL[] = [];
@@ -130,5 +131,19 @@ export class FlightsRepository {
       .select({ status: flightsTable.status, count: count() })
       .from(flightsTable)
       .groupBy(flightsTable.status);
+  }
+
+  async update(id: string, dto: UpdateFlightDto) {
+    const [flight] = await this.db
+      .update(flightsTable)
+      .set({
+        flightNumber: dto.flightNumber,
+        origin: dto.origin,
+        destination: dto.destination,
+      })
+      .where(eq(flightsTable.id, id))
+      .returning();
+
+    return flight ?? null;
   }
 }

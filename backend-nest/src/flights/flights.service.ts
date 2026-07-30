@@ -4,12 +4,15 @@ import { Flight, FlightFilters } from './entities/flight.entity';
 import { CreateFlightDto } from './dto/create-flight.dto';
 import { AppError } from 'src/shared/errors/AppError';
 import Redis from 'ioredis';
+import { FlightsGateway } from './flights.gateway';
+import { UpdateFlightDto } from './dto/update-flight.dto';
 
 @Injectable()
 export class FlightsService {
   constructor(
     private readonly flightsRepository: FlightsRepository,
     @Inject('REDIS_CLIENT') private readonly redis: Redis,
+    private readonly gateway: FlightsGateway,
   ) {}
 
   private async getCacheVersion(): Promise<number> {
@@ -96,5 +99,13 @@ export class FlightsService {
     }
 
     return stats;
+  }
+
+  async update(id: string, dto: UpdateFlightDto) {
+    const flight = await this.flightsRepository.update(id, dto);
+    await this.redis.del('flights:all');
+
+    this.gateway.server.to(`flight:${id}`).emit('flight:updated', flight);
+    return flight;
   }
 }
