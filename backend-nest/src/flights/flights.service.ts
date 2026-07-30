@@ -1,25 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { FlightsRepository } from './flights.repository';
 import { Flight, FlightFilters } from './entities/flight.entity';
 import { CreateFlightDto } from './dto/create-flight.dto';
 import { AppError } from 'src/shared/errors/AppError';
+import Redis from 'ioredis';
 
 @Injectable()
 export class FlightsService {
-  constructor(private readonly flightsRepository: FlightsRepository) {}
+  constructor(
+    private readonly flightsRepository: FlightsRepository,
+    @Inject('REDIS_CLIENT') private readonly redis: Redis,
+  ) {}
+
+  private async getCacheVersion(): Promise<number> {
+    const version = await this.redis.get('flights:cache_version');
+
+    return version ? parseInt(version, 10) : 1;
+  }
+
+  private async bumpCacheVersion() {
+    await this.redis.incr('flights:cache_version');
+  }
 
   async getFlights(filters: FlightFilters) {
+    const version = await this.getCacheVersion();
+    const cacheKey = `flights:v${version}${JSON.stringify(filters)}`;
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
     const [data, total] = await Promise.all([
       this.flightsRepository.findAll(filters),
       this.flightsRepository.count(filters),
     ]);
-
-    return {
+    const result = {
       data,
       total,
       limit: filters.limit ?? 20,
       offset: filters.offset ?? 0,
     };
+
+    await this.redis.set(cacheKey, JSON.stringify(result), 'EX', 30);
+    return result;
   }
 
   async getFlightById(id: string) {
@@ -38,7 +61,9 @@ export class FlightsService {
     if (dep >= arr) {
       throw new AppError(400, 'departureTime must be before arrivalTime');
     }
-    return this.flightsRepository.create(dto);
+    const flight = await this.flightsRepository.create(dto);
+    await this.bumpCacheVersion();
+    return flight;
   }
 
   async updateStatus(id: string, status: Flight['status']) {
@@ -48,6 +73,7 @@ export class FlightsService {
       throw new AppError(404, `Flight ${id} not found`);
     }
 
+    await this.bumpCacheVersion();
     return flight;
   }
 
@@ -58,6 +84,7 @@ export class FlightsService {
       throw new AppError(404, `Flight ${id} not found`);
     }
 
+    await this.bumpCacheVersion();
     return flight;
   }
 

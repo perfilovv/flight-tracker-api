@@ -3,9 +3,10 @@ import { FlightsController } from './flights.controller';
 import { FlightsService } from './flights.service';
 import { FlightsRepository } from './flights.repository';
 import { DatabaseModule } from 'src/database/database.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, RedisModule],
   controllers: [FlightsController],
   providers: [FlightsService, FlightsRepository],
 })
