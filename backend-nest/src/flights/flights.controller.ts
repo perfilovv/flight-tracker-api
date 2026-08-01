@@ -24,8 +24,8 @@ export class FlightsController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  getAll() {
-    return this.flightsService.getFlights({});
+  findAll() {
+    return this.flightsService.findAll({});
   }
 
   @UseGuards(JwtAuthGuard)

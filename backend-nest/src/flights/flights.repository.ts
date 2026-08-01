@@ -83,7 +83,7 @@ export class FlightsRepository {
     return Number(result.value);
   }
 
-  async findById(id: string) {
+  async getById(id: string) {
     const [flight] = await this.db
       .select()
       .from(flightsTable)

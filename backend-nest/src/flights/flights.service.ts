@@ -25,7 +25,7 @@ export class FlightsService {
     await this.redis.incr('flights:cache_version');
   }
 
-  async getFlights(filters: FlightFilters) {
+  async findAll(filters: FlightFilters) {
     const version = await this.getCacheVersion();
     const cacheKey = `flights:v${version}${JSON.stringify(filters)}`;
     const cached = await this.redis.get(cacheKey);
@@ -48,8 +48,8 @@ export class FlightsService {
     return result;
   }
 
-  async getFlightById(id: string) {
-    const flight = await this.flightsRepository.findById(id);
+  async getById(id: string) {
+    const flight = await this.flightsRepository.getById(id);
 
     if (!flight) {
       throw new AppError(404, `Flight ${id} not found`);
@@ -80,7 +80,7 @@ export class FlightsService {
     return flight;
   }
 
-  async deleteFlight(id: string) {
+  async delete(id: string) {
     const flight = await this.flightsRepository.delete(id);
 
     if (!flight) {
