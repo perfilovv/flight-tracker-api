@@ -17,13 +17,15 @@ services:
       retries: 5
 
   api:
-    build: .
+    build: ./backend-nest
     container_name: flight-tracker-api
     ports:
       - '3000:3000'
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
         condition: service_healthy
