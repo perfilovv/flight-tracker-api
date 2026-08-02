@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { FlightsService } from './flights.service';
 import { FlightsRepository } from './flights.repository';
-import { AppError } from 'src/shared/errors/AppError';
+import { AppError } from 'src/shared/errors/app-error';
 import { FlightsGateway } from './flights.gateway';
 
 describe('FlightsService', () => {

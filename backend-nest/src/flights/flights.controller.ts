@@ -10,7 +10,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateFlightDto } from './dto/create-flight.dto';
 import { FlightsService } from './flights.service';
-import { RateLimitGuard } from 'src/auth/rate-limit.guard';
+import { RateLimitGuard } from 'src/shared/guards/rate-limit.guard';
 import { UpdateFlightDto } from './dto/update-flight.dto';
 
 @Controller('flights')

@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { AppError } from './AppError';
+import { AppError } from './app-error';
 
 @Catch(AppError)
 export class AppErrorFilter implements ExceptionFilter {
