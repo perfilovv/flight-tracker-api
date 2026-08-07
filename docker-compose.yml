@@ -16,25 +16,6 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
-    build: ./backend-nest
-    container_name: flight-tracker-api
-    ports:
-      - '3000:3000'
-    environment:
-      PORT: 3000
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      JWT_SECRET: ${JWT_SECRET}
-      REDIS_URL: redis://redis:6379
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-    healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health/live']
-      interval: 10s
-      timeout: 5s
-      retries: 5
   redis:
     image: redis:alpine
     ports:
