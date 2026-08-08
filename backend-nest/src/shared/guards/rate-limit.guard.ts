@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
+import { Request } from 'express';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -12,7 +13,7 @@ export class RateLimitGuard implements CanActivate {
   constructor(@Inject('REDIS_CLIENT') private readonly redis: Redis) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest<Request>();
     const key = `ratelimit:${req.ip}`;
 
     const count = await this.redis.incr(key);

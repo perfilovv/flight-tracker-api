@@ -23,8 +23,8 @@ export class FlightsGateway
   }
 
   @SubscribeMessage('flights:subscribe')
-  handleSubscribe(client: Socket, flightId: string) {
-    client.join(`flight:${flightId}`);
+  async handleSubscribe(client: Socket, flightId: string) {
+    await client.join(`flight:${flightId}`);
     return { status: 'subscribed', flightId };
   }
 }

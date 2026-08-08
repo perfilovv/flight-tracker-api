@@ -1,6 +1,9 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
+import { Server } from 'http';
 import { AppModule } from 'src/app.module';
+import { config } from 'src/config/env.config';
 import request from 'supertest';
 
 describe('Flights (e2e)', () => {
@@ -22,13 +25,19 @@ describe('Flights (e2e)', () => {
     );
     await app.init();
 
-    validToken = 'TOKEN';
+    const jwtService = app.get(JwtService);
+    validToken = jwtService.sign(
+      { sub: 'test-user-id', email: 'test@example.com' },
+      { secret: config.jwtSecret },
+    );
   });
 
   afterAll(async () => await app.close());
 
   it('POST /api/flights without token should return 401', async () => {
-    return request(app.getHttpServer())
+    const server = app.getHttpServer() as Server;
+
+    return request(server)
       .post('/api/flights')
       .send({
         flightNumber: 'AA123',
@@ -42,7 +51,9 @@ describe('Flights (e2e)', () => {
   });
 
   it('POST /api/flights with valid token should return 201', async () => {
-    return request(app.getHttpServer())
+    const server = app.getHttpServer() as Server;
+
+    return request(server)
       .post('/api/flights')
       .set('Authorization', `Bearer ${validToken}`)
       .send({
@@ -57,7 +68,9 @@ describe('Flights (e2e)', () => {
   });
 
   it('POST /api/flights with invalid body should return 400', async () => {
-    return request(app.getHttpServer())
+    const server = app.getHttpServer() as Server;
+
+    return request(server)
       .post('/api/flights')
       .set('Authorization', `Bearer ${validToken}`)
       .send({

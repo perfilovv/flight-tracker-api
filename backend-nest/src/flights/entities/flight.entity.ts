@@ -15,3 +15,10 @@ export interface FlightFilters {
   dateFrom?: string;
   dateTo?: string;
 }
+
+export interface FindAllResult {
+  data: Flight[];
+  total: number;
+  limit: number;
+  offset: number;
+}

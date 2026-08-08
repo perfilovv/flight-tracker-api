@@ -3,12 +3,13 @@ import { FlightsService } from './flights.service';
 import { FlightsRepository } from './flights.repository';
 import { AppError } from 'src/shared/errors/app-error';
 import { FlightsGateway } from './flights.gateway';
+import { PinoLogger } from 'nestjs-pino';
 
 describe('FlightsService', () => {
   let service: FlightsService;
   let repo: {
     findAll: jest.Mock;
-    findStats: jest.Mock;
+    getStats: jest.Mock;
     getById: jest.Mock;
     count: jest.Mock;
   };
@@ -16,7 +17,7 @@ describe('FlightsService', () => {
   beforeEach(async () => {
     repo = {
       findAll: jest.fn(),
-      findStats: jest.fn(),
+      getStats: jest.fn(),
       getById: jest.fn(),
       count: jest.fn(),
     };
@@ -31,6 +32,16 @@ describe('FlightsService', () => {
         {
           provide: FlightsGateway,
           useValue: {},
+        },
+        {
+          provide: PinoLogger,
+          useValue: {
+            setContext: jest.fn(),
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -61,6 +72,16 @@ describe('FlightsService', () => {
         {
           provide: FlightsGateway,
           useValue: {},
+        },
+        {
+          provide: PinoLogger,
+          useValue: {
+            setContext: jest.fn(),
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
         },
       ],
     }).compile();
