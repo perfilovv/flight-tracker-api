@@ -1,7 +1,9 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { Server } from 'http';
 import { AppModule } from 'src/app.module';
+import { config } from 'src/config/env.config';
 import request from 'supertest';
 
 describe('Flights (e2e)', () => {
@@ -23,7 +25,11 @@ describe('Flights (e2e)', () => {
     );
     await app.init();
 
-    validToken = 'TOKEN';
+    const jwtService = app.get(JwtService);
+    validToken = jwtService.sign(
+      { sub: 'test-user-id', email: 'test@example.com' },
+      { secret: config.jwtSecret },
+    );
   });
 
   afterAll(async () => await app.close());
