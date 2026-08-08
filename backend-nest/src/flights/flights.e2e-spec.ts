@@ -47,7 +47,7 @@ describe('Flights (e2e)', () => {
         arrivalTime: '2023-10-01T14:00:00Z',
         status: 'scheduled',
       })
-      .expect(403);
+      .expect(401);
   });
 
   it('POST /api/flights with valid token should return 201', async () => {
