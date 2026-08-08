@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { FlightsRepository } from './flights.repository';
-import { Flight, FlightFilters } from './entities/flight.entity';
+import { FindAllResult, Flight, FlightFilters } from './entities/flight.entity';
 import { CreateFlightDto } from './dto/create-flight.dto';
 import { AppError } from 'src/shared/errors/app-error';
 import Redis from 'ioredis';
@@ -29,7 +29,7 @@ export class FlightsService {
     await this.redis.incr('flights:cache_version');
   }
 
-  async findAll(filters: FlightFilters) {
+  async findAll(filters: FlightFilters): Promise<FindAllResult> {
     const version = await this.getCacheVersion();
     const cacheKey = `flights:v${version}${JSON.stringify(filters)}`;
     const cached = await this.redis.get(cacheKey);
