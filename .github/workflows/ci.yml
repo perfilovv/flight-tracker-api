@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-nest
 
     services:
       postgres:
@@ -42,6 +45,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: backend-nest/package-lock.json
 
       - run: npm ci
 
