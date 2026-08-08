@@ -73,6 +73,16 @@ describe('FlightsService', () => {
           provide: FlightsGateway,
           useValue: {},
         },
+        {
+          provide: PinoLogger,
+          useValue: {
+            setContext: jest.fn(),
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
