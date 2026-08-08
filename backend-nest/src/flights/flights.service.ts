@@ -34,7 +34,7 @@ export class FlightsService {
     const cacheKey = `flights:v${version}${JSON.stringify(filters)}`;
     const cached = await this.redis.get(cacheKey);
     if (cached) {
-      return JSON.parse(cached);
+      return JSON.parse(cached) as FindAllResult;
     }
 
     this.logger.info({ filters }, 'fetching flights from db');

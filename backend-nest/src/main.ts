@@ -21,4 +21,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AppErrorFilter());
   await app.listen(config.port ?? 3000);
 }
-bootstrap();
+void bootstrap().catch((error: unknown) => {
+  console.error('Failed to start application', error);
+  process.exitCode = 1;
+});
