@@ -40,7 +40,7 @@ describe('Flights (e2e)', () => {
     return request(server)
       .post('/api/flights')
       .send({
-        flightNumber: 'AA123',
+        flightNumber: 'AA1231',
         origin: 'JFK',
         destination: 'LAX',
         departureTime: '2023-10-01T10:00:00Z',
