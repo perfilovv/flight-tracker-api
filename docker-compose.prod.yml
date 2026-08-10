@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
 
   api:
-    build: ./backend-nest
+    image: ghcr.io/perfilovv/flight-tracker-api:latest
     container_name: flight-tracker-api
     restart: unless-stopped
     ports:
