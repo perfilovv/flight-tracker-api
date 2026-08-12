@@ -15,6 +15,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(helmet());
 
+  app.enableCors({
+    origin: config.nodeEnv === 'production' ? config.frontendUrl : true,
+    credentials: true,
+  });
+
   const expressApp = app.getHttpAdapter().getInstance() as Express;
   expressApp.set('trust proxy', 1);
 
