@@ -11,6 +11,7 @@ async function bootstrap() {
   });
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
