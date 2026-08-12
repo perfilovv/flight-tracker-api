@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppErrorFilter } from './shared/errors/error.filter';
 import { Logger } from 'nestjs-pino';
 import { Express } from 'express';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -12,6 +13,7 @@ async function bootstrap() {
   });
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
+  app.use(helmet());
 
   const expressApp = app.getHttpAdapter().getInstance() as Express;
   expressApp.set('trust proxy', 1);
