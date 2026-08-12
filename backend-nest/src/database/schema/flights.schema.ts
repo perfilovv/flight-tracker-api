@@ -1,6 +1,18 @@
-import { index, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  index,
+  pgEnum,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
-export const flightStatusEnum = pgEnum('flight_status', ['scheduled', 'departed', 'arrived', 'cancelled']);
+export const flightStatusEnum = pgEnum('flight_status', [
+  'scheduled',
+  'departed',
+  'arrived',
+  'cancelled',
+]);
 
 export const flightsTable = pgTable(
   'flights',
@@ -13,7 +25,9 @@ export const flightsTable = pgTable(
 
     destination: varchar('destination', { length: 3 }).notNull(),
 
-    departureTime: timestamp('departure_time', { withTimezone: true }).notNull(),
+    departureTime: timestamp('departure_time', {
+      withTimezone: true,
+    }).notNull(),
 
     arrivalTime: timestamp('arrival_time', {
       withTimezone: true,
@@ -25,9 +39,13 @@ export const flightsTable = pgTable(
       length: 10,
     }),
 
-    updatedAt: timestamp('updated_at', { withTimezone: true }).$onUpdate(() => new Date()),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
 
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [
     index('flights_departure_time_idx').on(table.departureTime),
@@ -40,4 +58,3 @@ export const flightsTable = pgTable(
     index('flights_status_departure_idx').on(table.status, table.departureTime),
   ],
 );
-
