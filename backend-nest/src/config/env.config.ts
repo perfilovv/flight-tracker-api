@@ -7,6 +7,7 @@ const envSchema = z.object({
   DATABASE_URL: z.url(),
   JWT_SECRET: z.string().min(1),
   REDIS_URL: z.string(),
+  FRONTEND_URL: z.url().optional(),
 });
 
 const env = envSchema.parse(process.env);
@@ -17,4 +18,5 @@ export const config = {
   databaseUrl: env.DATABASE_URL,
   jwtSecret: env.JWT_SECRET,
   redisUrl: env.REDIS_URL,
+  frontendUrl: env.FRONTEND_URL,
 } as const;
