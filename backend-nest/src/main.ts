@@ -4,6 +4,7 @@ import { config } from './config/env.config';
 import { ValidationPipe } from '@nestjs/common';
 import { AppErrorFilter } from './shared/errors/error.filter';
 import { Logger } from 'nestjs-pino';
+import { Express } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -11,7 +12,8 @@ async function bootstrap() {
   });
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
-  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+  const expressApp: Express = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
