@@ -102,6 +102,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: 'docker-compose.prod.yml'
           target: '/home/deploy/app/'
+          overwrite: true
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1
