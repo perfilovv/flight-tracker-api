@@ -12,8 +12,10 @@ async function bootstrap() {
   });
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
-  const expressApp: Express = app.getHttpAdapter().getInstance();
+
+  const expressApp = app.getHttpAdapter().getInstance() as Express;
   expressApp.set('trust proxy', 1);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
