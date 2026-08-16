@@ -9,7 +9,7 @@ const migrationEnvSchema = z.object({
 const env = migrationEnvSchema.parse(process.env);
 
 export default defineConfig({
-  schema: './src/modules/**/*.schema.ts',
+  schema: './src/database/schema/*.schema.ts',
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
