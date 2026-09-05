@@ -18,6 +18,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(200)
   @RateLimit({ points: 5, duration: 300 })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
