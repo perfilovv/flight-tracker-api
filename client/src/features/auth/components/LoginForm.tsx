@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginFormData } from '../schemas';
 import { useMutation } from '@tanstack/react-query';
-import { ApiError, login } from '../api';
+import { login } from '../api';
+import { ApiError } from '@/shared/api/client';
 
 export function LoginForm() {
   const navigate = useNavigate();

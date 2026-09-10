@@ -4,9 +4,10 @@ import { useForm } from 'react-hook-form';
 import { registerSchema, type RegisterFormData } from '../schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { ApiError, register } from '../api';
+import { register } from '../api';
 import { Input } from '@base-ui/react/input';
 import { Button } from '@base-ui/react/button';
+import { ApiError } from '@/shared/api/client';
 
 export function RegisterForm() {
   const navigate = useNavigate();
