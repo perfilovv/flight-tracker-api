@@ -37,7 +37,7 @@ export async function apiClient<T>(path: string, options: RequestOptions = {}): 
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, (await data.message) ?? 'Something went wrong');
+    throw new ApiError(res.status, data.error ?? data.message ?? 'Something went wrong');
   }
 
   if (res.status === 204) {

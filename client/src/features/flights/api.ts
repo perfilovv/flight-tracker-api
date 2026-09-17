@@ -8,12 +8,31 @@ export interface Flight {
   departureTime: string;
   arrivalTime: string;
   status: string;
+  aircraftType: string | null;
+  updatedAt: string | null;
+  createdAt: string;
 }
 
-export const getFlights = () => apiClient<Flight[]>('/flights');
+interface FlightsResponse {
+  data: Flight[];
+  total: number;
+  limit: number;
+  offset: number;
+}
 
-export const createFlight = (flight: Omit<Flight, 'id' | 'status'>) =>
+export type CreateFlightData = Pick<
+  Flight,
+  'flightNumber' | 'origin' | 'destination' | 'departureTime' | 'arrivalTime'
+>;
+
+export const getFlights = (page = 1, limit = 20) => {
+  const offset = (page - 1) * limit;
+  return apiClient<FlightsResponse>(`/flights?limit=${limit}&offset=${offset}`);
+};
+
+export const createFlight = (flight: CreateFlightData) =>
   apiClient<Flight>('/flights', {
     method: 'POST',
     body: JSON.stringify(flight),
   });
+
