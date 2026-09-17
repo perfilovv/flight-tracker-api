@@ -4,7 +4,8 @@ import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Badge } from '@/shared/components/ui/badge';
 import { FlightFormDialog } from './FlightFormDialog';
 import { Button } from '@/shared/components/ui/button';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useFlightUpdates } from '../hooks/useFlightUpdates';
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
   scheduled: 'secondary',
@@ -17,6 +18,9 @@ export function FlightsList() {
   const { data: flights, isLoading, isError } = useFlights(page);
 
   const hasMore = flights ? flights.offset + flights.data.length < flights.total : false;
+
+  const flightIds = useMemo(() => flights?.data.map((flight) => flight.id) ?? [], [flights]);
+  const { status } = useFlightUpdates(flightIds);
 
   if (isLoading) {
     return (
@@ -46,7 +50,14 @@ export function FlightsList() {
   return (
     <div className='p-6'>
       <div className='flex justify-between items-center mb-4'>
-        <h1 className='text-2xl font-semibold'>Рейсы</h1>
+        <div className='flex items-center gap-2'>
+          <h1 className='text-2xl font-semibold'>Рейсы</h1>
+
+          <span
+            className={`w-2 h-2 rounded-full ${status === 'connected' ? 'bg-green-500' : 'bg-gray-400'}`}
+            title={status === 'connected' ? 'Live-обновления активны' : 'Нет соединения'}
+          />
+        </div>
         <FlightFormDialog />
       </div>
 
