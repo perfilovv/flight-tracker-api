@@ -6,6 +6,8 @@ import { FlightFormDialog } from './FlightFormDialog';
 import { Button } from '@/shared/components/ui/button';
 import { useMemo, useState } from 'react';
 import { useFlightUpdates } from '../hooks/useFlightUpdates';
+import { ConnectionIndicator } from '@/shared/components/ConnectionIndicator';
+import { PlaneTakeoff } from 'lucide-react';
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
   scheduled: 'secondary',
@@ -40,8 +42,10 @@ export function FlightsList() {
 
   if (!flights || !flights.data.length) {
     return (
-      <div className='p-6 text-center'>
-        <p className='text-muted-foreground mb-4'>Пока нет ни одного рейса</p>
+      <div className='flex flex-col items-center justify-center py-16 text-center'>
+        <PlaneTakeoff className='w-12 h-12 text-muted-foreground mb-4' />
+        <h2 className='text-lg font-medium mb-1'>Пока нет ни одного рейса</h2>
+        <p className='text-muted-foreground mb-4 text-sm'>Добавь первый рейс, чтобы начать отслеживание</p>
         <FlightFormDialog />
       </div>
     );
@@ -52,11 +56,7 @@ export function FlightsList() {
       <div className='flex justify-between items-center mb-4'>
         <div className='flex items-center gap-2'>
           <h1 className='text-2xl font-semibold'>Рейсы</h1>
-
-          <span
-            className={`w-2 h-2 rounded-full ${status === 'connected' ? 'bg-green-500' : 'bg-gray-400'}`}
-            title={status === 'connected' ? 'Live-обновления активны' : 'Нет соединения'}
-          />
+          <ConnectionIndicator status={status} />
         </div>
         <FlightFormDialog />
       </div>

@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSocket } from '@/shared/socket/useSocket';
 import { type Flight } from '../api';
 import { FLIGHTS_QUERY_KEY } from './useFlights';
+import { toast } from 'sonner';
 
 export function useFlightUpdates(flightIds: string[]) {
   const { socket, status } = useSocket();
@@ -13,14 +14,16 @@ export function useFlightUpdates(flightIds: string[]) {
 
     flightIds.forEach((id) => socket.emit('flights:subscribe', id));
 
-    const handleUpdate = (_: Flight) => {
+    const handleUpdate = (flight: Flight) => {
       queryClient.invalidateQueries({ queryKey: FLIGHTS_QUERY_KEY });
+      toast.info(`Рейс ${flight.flightNumber} обновлён: ${flight.status}`);
     };
 
-    const handleCreated = (_: Flight) => {
+    const handleCreated = (flight: Flight) => {
       queryClient.invalidateQueries({
         queryKey: FLIGHTS_QUERY_KEY,
       });
+      toast.success(`Новый рейс добавлен: ${flight.flightNumber}`);
     };
 
     socket.on('flight:updated', handleUpdate);

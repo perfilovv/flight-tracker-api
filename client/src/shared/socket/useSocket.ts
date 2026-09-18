@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import { useAuthStore } from '@/features/auth/store';
+import { toast } from 'sonner';
 
 const WS_URL = import.meta.env.VITE_WS_URL;
 
@@ -21,6 +22,11 @@ export function useSocket() {
     socket.on('connect', () => setStatus('connected'));
     socket.on('disconnect', () => setStatus('disconnected'));
     socket.on('connect_error', () => setStatus('disconnected'));
+    socket.io.on('reconnect_attempt', () => setStatus('connecting'));
+    socket.io.on('reconnect', () => {
+      setStatus('connected');
+      toast.success('Соединение восстановлено');
+    });
 
     socketRef.current = socket;
 
