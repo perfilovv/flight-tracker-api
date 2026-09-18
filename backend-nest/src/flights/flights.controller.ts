@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -13,14 +14,15 @@ import { FlightsService } from './flights.service';
 import { RateLimitGuard } from 'src/shared/guards/rate-limit.guard';
 import { UpdateFlightDto } from './dto/update-flight.dto';
 import { Flight } from './entities/flight.entity';
+import { FindFlightsQueryDto } from './dto/find-flights-query.dto';
 
 @Controller('flights')
 export class FlightsController {
   constructor(private readonly flightsService: FlightsService) {}
 
   @Get()
-  findAll() {
-    return this.flightsService.findAll({});
+  findAll(@Query() query: FindFlightsQueryDto) {
+    return this.flightsService.findAll(query);
   }
 
   @Get(':id')

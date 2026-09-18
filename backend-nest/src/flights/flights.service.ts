@@ -76,6 +76,8 @@ export class FlightsService {
     const flight = await this.flightsRepository.create(dto);
     this.logger.info({ flightId: flight.id }, 'flight created');
     await this.bumpCacheVersion();
+
+    this.gateway.server.emit('flight:created', flight);
     return flight;
   }
 
