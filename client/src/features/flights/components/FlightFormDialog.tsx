@@ -35,7 +35,7 @@ export function FlightFormDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button>Добавить рейс</Button>} />
+      <DialogTrigger render={<Button variant='outline'>Добавить рейс</Button>} />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Новый рейс</DialogTitle>

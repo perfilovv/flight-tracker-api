@@ -5,9 +5,10 @@ import { registerSchema, type RegisterFormData } from '../schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { register } from '../api';
-import { Input } from '@base-ui/react/input';
-import { Button } from '@base-ui/react/button';
 import { ApiError } from '@/shared/api/client';
+import { Label } from '@/shared/components/ui/label';
+import { Input } from '@/shared/components/ui/input';
+import { Button } from '@/shared/components/ui/button';
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -37,15 +38,23 @@ export function RegisterForm() {
       : null;
 
   return (
-    <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className='space-y-4 max-w-sm'>
-      <div>
-        <Input type='email' placeholder='Email' {...registerField('email')} />
-        {errors.email && <p className='text-sm text-red-500 mt-1'>{errors.email.message}</p>}
+    <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className='space-y-4'>
+      <div className='grid gap-2'>
+        <Label htmlFor='email'>Email</Label>
+        <Input id='email' type='email' autoComplete='email' {...registerField('email')} />
+        {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
       </div>
 
-      <div>
-        <Input type='password' placeholder='Пароль (минимум 8 символов)' {...registerField('password')} />
-        {errors.password && <p className='text-sm text-red-500 mt-1'>{errors.password.message}</p>}
+      <div className='grid gap-2'>
+        <Label htmlFor='password'>Пароль</Label>
+        <Input
+          id='password'
+          type='password'
+          autoComplete='new-password'
+          placeholder='Минимум 8 символов'
+          {...registerField('password')}
+        />
+        {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
       </div>
 
       {errorMessage && <p className='text-sm text-red-500'>{errorMessage}</p>}

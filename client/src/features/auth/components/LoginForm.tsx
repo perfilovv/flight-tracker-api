@@ -1,5 +1,3 @@
-import { Button } from '@base-ui/react/button';
-import { Input } from '@base-ui/react/input';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../store';
 import { useForm } from 'react-hook-form';
@@ -8,6 +6,9 @@ import { loginSchema, type LoginFormData } from '../schemas';
 import { useMutation } from '@tanstack/react-query';
 import { login } from '../api';
 import { ApiError } from '@/shared/api/client';
+import { Label } from '@/shared/components/ui/label';
+import { Input } from '@/shared/components/ui/input';
+import { Button } from '@/shared/components/ui/button';
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -37,16 +38,18 @@ export function LoginForm() {
       : null;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 max-w-sm'>
-      <div>
-        <Input type='email' placeholder='Email' {...registerField('email')} />
-        {errors.email && <p className='text-sm text-red-500 mt-1'>{errors.email.message}</p>}
-      </div>
-      <div>
-        <Input type='password' placeholder='Пароль' {...registerField('password')} />
-        {errors.password && <p className='text-sm text-red-500 mt-1'>{errors.password.message}</p>}
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+      <div className='grid gap-2'>
+        <Label htmlFor='email'>Email</Label>
+        <Input id='email' type='email' autoComplete='email' {...registerField('email')} />
+        {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
       </div>
 
+      <div className='space-y-2'>
+        <Label htmlFor='password'>Пароль</Label>
+        <Input id='password' type='password' autoComplete='current-password' {...registerField('password')} />
+        {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
+      </div>
       {errorMessage && <p className='text-sm text-red-500'>{errorMessage}</p>}
 
       <Button type='submit' disabled={mutation.isPending} className='w-full'>
