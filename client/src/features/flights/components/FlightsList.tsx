@@ -55,37 +55,38 @@ export function FlightsList() {
     <div className='p-6'>
       <div className='flex justify-between items-center mb-4'>
         <div className='flex items-center gap-2'>
-          <h1 className='text-2xl font-semibold'>Рейсы</h1>
+          <h1 className='text-2xl font-semibold'>Fly Track</h1>
           <ConnectionIndicator status={status} />
         </div>
         <FlightFormDialog />
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Рейс</TableHead>
-            <TableHead>Откуда</TableHead>
-            <TableHead>Куда</TableHead>
-            <TableHead>Вылет</TableHead>
-            <TableHead>Статус</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {flights.data.map((flight) => (
-            <TableRow key={flight.id}>
-              <TableCell className='font-medium'>{flight.flightNumber}</TableCell>
-              <TableCell>{flight.origin}</TableCell>
-              <TableCell>{flight.destination}</TableCell>
-              <TableCell>{new Date(flight.departureTime).toLocaleString('ru-RU')}</TableCell>
-              <TableCell>
-                <Badge variant={statusVariant[flight.status] ?? 'secondary'}>{flight.status}</Badge>
-              </TableCell>
+      <div className='max-h-[70vh]  overflow-y-auto'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className='text-center'>Рейс</TableHead>
+              <TableHead className='text-center'>Откуда</TableHead>
+              <TableHead className='text-center'>Куда</TableHead>
+              <TableHead className='text-center'>Вылет</TableHead>
+              <TableHead className='text-center'>Статус</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
+          </TableHeader>
+          <TableBody>
+            {flights.data.map((flight) => (
+              <TableRow key={flight.id}>
+                <TableCell className='font-medium'>{flight.flightNumber}</TableCell>
+                <TableCell>{flight.origin}</TableCell>
+                <TableCell>{flight.destination}</TableCell>
+                <TableCell>{new Date(flight.departureTime).toLocaleString('ru-RU')}</TableCell>
+                <TableCell>
+                  <Badge variant={statusVariant[flight.status] ?? 'secondary'}>{flight.status}</Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
       <div className='flex items-center justify-between mt-4'>
         <p className='text-sm text-muted-foreground'>
           Показано {flights.data.length} из {flights?.total ?? 0}
